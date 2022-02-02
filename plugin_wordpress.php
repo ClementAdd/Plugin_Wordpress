@@ -8,7 +8,7 @@ Version: 1.1
 Author URI: https://github.com/ClementAdd
 */
 
-#region Init
+//Plugin initialization
 function init_plugin() {
 	add_option( 'chatID' );
 	add_option( 'webhook' );
@@ -19,20 +19,8 @@ function init_plugin() {
 }
 
 register_activation_hook( __FILE__, 'init_plugin' );
-#endregion
 
-#region Notification
-function show_message_function( $comment_ID, $comment_approved ) {
-	if ( 1 === $comment_approved ) {
-		$comment = get_comment( $comment_ID );
-		$author  = $comment->comment_author;
-		$subject = 'Nouveau commentaire de : ' . ucfirst( $author );
-		$message = $comment->comment_content;
-		telegram_notif( $subject . "\n" . $message );
-	}
-}
-
-add_action( 'comment_post', 'show_message_function', 10, 2 );
+#region Telegram
 
 function telegram_notif( $comment = "" ) {
 	$chatID   = get_option( 'chatID' );
@@ -49,6 +37,21 @@ function telegram_notif( $comment = "" ) {
 	}
 }
 
+function show_message_function( $comment_ID, $comment_approved ) {
+	if ( 1 === $comment_approved ) {
+		$comment = get_comment( $comment_ID );
+		$author  = $comment->comment_author;
+		$subject = 'Nouveau commentaire de : ' . ucfirst( $author );
+		$message = $comment->comment_content;
+		telegram_notif( $subject . "\n" . $message );
+	}
+}
+
+add_action( 'comment_post', 'show_message_function', 10, 2 );
+
+#endregion
+
+//Discord
 function discord_notif( $comment_ID, $comment_approved ) {
 	if ( 1 === $comment_approved ) {
 		$comment    = get_comment( $comment_ID );
@@ -94,18 +97,16 @@ function discord_notif( $comment_ID, $comment_approved ) {
 }
 
 add_action( 'comment_post', 'discord_notif', 10, 2 );
-#endregion
 
-#region Dashboard Menu
+//Dashboard Menu
 function notification_admin_menu() {
 	add_menu_page( 'Notifications Telegram', 'Telegram', 'manage_options', 'notifications-admin-menu-telegram', 'notification_admin_menu_telegram', 'dashicons-format-chat', 2 );
 	add_submenu_page( 'notifications-admin-menu-telegram', 'Discord', 'Discord', 'manage_options', 'notifications-admin-menu-discord', 'notifications_admin_menu_discord' );
 }
 
 add_action( 'admin_menu', 'notification_admin_menu' );
-#endregion
 
-#region Telegram Page
+//Telegram Page
 function notification_admin_menu_telegram() {
 	?>
     <h1>
@@ -132,9 +133,8 @@ function notification_admin_menu_telegram() {
     </form>
 	<?php
 }
-#endregion
 
-#region Discord Page
+//Discord Page
 function notifications_admin_menu_discord() {
 	?>
     <form action="admin.php?page=notifications-admin-menu-discord" method="post">
@@ -207,5 +207,4 @@ function notifications_admin_menu_discord() {
     </form>
 	<?php
 }
-#endregion
 
