@@ -57,7 +57,7 @@ function discord_notif( $comment_ID, $comment_approved ) {
 		$comment    = get_comment( $comment_ID );
 		$post_id    = $comment->comment_post_ID;
 		$timestamp = date( "c", strtotime( "now" ) );
-
+        $author = $comment->comment_author;
 		$json_data = json_encode( [
 
 			"username" => get_option('bot_name'),
@@ -77,7 +77,7 @@ function discord_notif( $comment_ID, $comment_approved ) {
 					"color" => hexdec( "3366ff" ),
 
 					"author" => [
-						"name" => get_option( 'bot_author' ) . ": " . $comment->comment_author,
+						"name" => get_option( 'bot_author' ) . ": " . ucfirst($author),
 					],
 				]
 			]
